@@ -45,7 +45,6 @@ spring:
 registered:
   client:
     id: ${CLIENT_ID:habilisadi}
-    secret: ${CLIENT_SECRET:sdifsjldifjsdlifjsdlifjlj}
     redirect-uri: ${DOMAIN_URL:http://localhost:8080}
 
 logging:

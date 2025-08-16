@@ -12,4 +12,11 @@ class BeanConfig {
     fun passwordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
+
+//    @Bean
+//    fun objectMapper() = ObjectMapper().apply {
+//        registerModules(SecurityJackson2Modules.getModules(this::class.java.classLoader))
+//        addMixIn(HashMap::class.java, UserEntity::class.java)
+//        registerModule(OAuth2AuthorizationServerJackson2Module())
+//    }
 }

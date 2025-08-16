@@ -28,6 +28,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher
@@ -37,26 +39,28 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
+import java.time.Duration
+import java.time.Instant
 
 
 @Configuration
 class SecurityConfig(
     private val jpaRegisteredClientRepository: JpaRegisteredClientRepository,
     @Value("\${registered.client.id}") private val CLIENT_ID: String,
-    @Value("\${registered.client.secret}") private val CLIENT_SECRET: String,
     @Value("\${registered.client.redirect-uri}") private val REDIRECT_URI: String
 ) {
-
     @Bean
     @Order(1)
     fun authorizationServerSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.securityMatcher("/oauth2/**", "/.well-known/**")
-            .with(OAuth2AuthorizationServerConfigurer(), withDefaults())
+        val authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer()
+        http.securityMatcher(authorizationServerConfigurer.endpointsMatcher) // 🔹 엔드포인트 매핑
+            .with(authorizationServerConfigurer) { configurer ->
+                configurer.oidc(withDefaults())
+            }
             .authorizeHttpRequests { authorize ->
                 authorize
                     .anyRequest().authenticated()
             }
-            .csrf { csrf -> csrf.disable() }
             .exceptionHandling { exceptions ->
                 exceptions.defaultAuthenticationEntryPointFor(
                     LoginUrlAuthenticationEntryPoint("/login"),
@@ -73,11 +77,15 @@ class SecurityConfig(
     @Bean
     @Order(2)
     fun defaultSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeHttpRequests { authorize ->
-            authorize.requestMatchers("/register", "/css/**", "/js/**", "/images/**", "/login")
-                .permitAll()
-            authorize.anyRequest().authenticated()
-        }
+        http
+            .authorizeHttpRequests { authorize ->
+                authorize.requestMatchers(
+                    "/register",
+                    "/login",
+                    "/error"
+                ).permitAll()
+                authorize.anyRequest().authenticated()
+            }
             .formLogin { formLogin ->
                 formLogin
                     .loginPage("/login")
@@ -89,6 +97,7 @@ class SecurityConfig(
                     .logoutSuccessUrl("/login?logout")
                     .permitAll()
             }
+
         return http.build()
     }
 
@@ -97,28 +106,44 @@ class SecurityConfig(
     @Primary
     fun registeredClientRepository(passwordEncoder: PasswordEncoder): RegisteredClientRepository {
 
-        if (jpaRegisteredClientRepository.count() != 0L) {
-            return CustomRegisteredClientRepository(jpaRegisteredClientRepository)
-        }
-
-        val registeredClient = RegisteredClient.withId(UlidCreator.getUlid().toString())
-            .clientId(CLIENT_ID)
-            .clientSecret(passwordEncoder.encode(CLIENT_SECRET))
-            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .redirectUri("$REDIRECT_URI/login/oauth2/code/$CLIENT_ID")
-            .scopes {
-                it.addAll(
-                    listOf(
-                        OidcScopes.OPENID,
-                        "roles"
-                    )
-                )
-            }
+        val clientSettings = ClientSettings.builder()
+            .requireAuthorizationConsent(true)
+            .requireProofKey(false)  // PKCE 비활성화
             .build()
 
-        jpaRegisteredClientRepository.save(RegisteredClientEntity.from(registeredClient))
+        if (jpaRegisteredClientRepository.count() == 0L) {
+            val registeredClient = RegisteredClient.withId(UlidCreator.getUlid().toString())
+                .clientId(CLIENT_ID)
+                .clientName(CLIENT_ID)
+                .clientIdIssuedAt(Instant.now())
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantTypes {
+                    it.add(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    it.add(AuthorizationGrantType.REFRESH_TOKEN)
+                }
+                .redirectUri("$REDIRECT_URI/login/oauth2/code/$CLIENT_ID")
+                .tokenSettings(
+                    TokenSettings.builder()
+                        .refreshTokenTimeToLive(Duration.ofDays(30))
+                        .accessTokenTimeToLive(Duration.ofDays(1))
+                        .reuseRefreshTokens(true)
+                        .build()
+                )
+                .scopes {
+                    it.addAll(
+                        listOf(
+                            OidcScopes.OPENID,
+                            OidcScopes.PROFILE,
+                            OidcScopes.EMAIL,
+                            "roles"
+                        )
+                    )
+                }
+                .clientSettings(clientSettings)
+                .build()
+
+            jpaRegisteredClientRepository.save(RegisteredClientEntity.from(registeredClient))
+        }
 
         return CustomRegisteredClientRepository(jpaRegisteredClientRepository)
     }
@@ -129,20 +154,27 @@ class SecurityConfig(
 
     @Bean
     fun authorizationServerSettings() =
-        AuthorizationServerSettings.builder().build()
+        AuthorizationServerSettings.builder()
+//            .issuer("http://localhost:8080")
+            .build()
 
     @Bean
     fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
 
+        config.allowedOrigins = listOf("http://localhost:8080")  // 명시적으로 origin 설정
         config.allowedMethods = listOf(
             "GET",
             "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
         )
         config.allowedHeaders = listOf(
             "Authorization",
             "Content-Type",
+            "X-Requested-With"
         )
         config.allowCredentials = true
         config.maxAge = 3600L

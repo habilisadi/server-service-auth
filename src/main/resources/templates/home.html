@@ -140,11 +140,11 @@
                 padding: 30px 20px;
                 margin: 10px;
             }
-            
+
             h1 {
                 font-size: 28px;
             }
-            
+
             .btn {
                 display: block;
                 margin: 10px 0;
@@ -192,17 +192,17 @@
         <p><strong>Token Endpoint:</strong> <code>/oauth2/token</code></p>
         <p><strong>User Info Endpoint:</strong> <code>/userinfo</code></p>
         <p><strong>JWK Set Endpoint:</strong> <code>/.well-known/jwks.json</code></p>
-        <p><strong>OpenID Configuration:</strong> <code>/.well-known/openid_configuration</code></p>
+        <p><strong>OpenID Configuration:</strong> <code>/.well-known/openid-configuration</code></p>
     </div>
 
     <!-- 액션 버튼들 -->
     <div class="actions">
-        <a th:href="@{/register}" class="btn" th:unless="${username}">회원가입</a>
-        <a th:href="@{/login}" class="btn" th:unless="${username}">로그인</a>
-        
-        <form th:if="${username}" action="/logout" method="post" style="display: inline;">
+        <a class="btn" th:href="@{/register}" th:unless="${username}">회원가입</a>
+        <a class="btn" th:href="@{/login}" th:unless="${username}">로그인</a>
+
+        <form action="/logout" method="post" style="display: inline;" th:if="${username}">
             <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-            <button type="submit" class="btn btn-danger">로그아웃</button>
+            <button class="btn btn-danger" type="submit">로그아웃</button>
         </form>
     </div>
 </div>

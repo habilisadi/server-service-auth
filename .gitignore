@@ -39,3 +39,14 @@ out/
 ### Kotlin ###
 .kotlin
 application-*.yml
+/log
+.gz
+.log
+*.log
+*.gz
+*.zip
+*.tar
+*.csv
+*.json
+*.db
+*.m
