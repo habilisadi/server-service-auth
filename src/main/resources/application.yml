@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+
+
 spring:
   application:
     name: habilisadi_auth
@@ -40,8 +42,11 @@ spring:
     enabled: true
     default-schema: auth
 
-jwt:
-  secret: ${JWT_SECRET}
+registered:
+  client:
+    id: ${CLIENT_ID:habilisadi}
+    secret: ${CLIENT_SECRET:sdifsjldifjsdlifjsdlifjlj}
+    redirect-uri: ${DOMAIN_URL:http://localhost:8080}
 
 logging:
   level:

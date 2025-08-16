@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Habilisadi - 회원가입</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 35px;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+        }
+
+        input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+        }
+
+        .alert-danger {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .alert-success {
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+            border-left: 4px solid #27ae60;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e6ed;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 25px;
+            color: #2980b9;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .password-requirements ul {
+            margin: 8px 0 0 20px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .register-container {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+            
+            h2 {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            input[type="email"], input[type="password"] {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            input[type="submit"] {
+                padding: 16px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .register-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h2>회원가입</h2>
+
+    <!-- 성공 메시지 -->
+    <div class="alert alert-success" th:if="${success}">
+        회원가입이 완료되었습니다! 로그인 페이지로 이동해서 로그인하세요.
+    </div>
+
+    <!-- 에러 메시지 -->
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}">
+        회원가입 중 오류가 발생했습니다.
+    </div>
+
+    <!-- 비밀번호 요구사항 -->
+    <div class="password-requirements" th:unless="${success}">
+        <strong>비밀번호 요구사항</strong>
+        <ul>
+            <li>최소 8자 이상</li>
+            <li>영문, 숫자, 특수문자 포함</li>
+            <li>비밀번호 확인과 일치</li>
+        </ul>
+    </div>
+
+    <form method="post" th:action="@{/register}" th:unless="${success}">
+        <div class="form-group">
+            <label for="email">이메일:</label>
+            <input autofocus id="email" name="email" required 
+                   th:value="${email != null ? email : ''}"
+                   type="email" placeholder="example@domain.com">
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호:</label>
+            <input id="password" name="password" required type="password" 
+                   minlength="8" placeholder="비밀번호를 입력하세요">
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">비밀번호 확인:</label>
+            <input id="confirmPassword" name="confirmPassword" required type="password" 
+                   minlength="8" placeholder="비밀번호를 다시 입력하세요">
+        </div>
+
+        <!-- CSRF 토큰 -->
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+
+        <input type="submit" value="회원가입">
+    </form>
+
+    <div class="login-link">
+        <span th:if="${success}">
+            <a th:href="@{/login}">로그인 페이지로 이동</a>
+        </span>
+        <span th:unless="${success}">
+            이미 계정이 있으신가요? <a th:href="@{/login}">로그인</a>
+        </span>
+    </div>
+</div>
+
+<script>
+    // 비밀번호 확인 검증
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        
+        if (password !== confirmPassword) {
+            this.setCustomValidity('비밀번호가 일치하지 않습니다.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // 이메일 형식 검증
+    document.getElementById('email').addEventListener('input', function() {
+        const email = this.value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!emailRegex.test(email) && email.length > 0) {
+            this.setCustomValidity('올바른 이메일 형식을 입력하세요.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+</body>
+</html>

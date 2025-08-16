@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Habilisadi - 로그인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 35px;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+        }
+
+        .alert-danger {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .alert-success {
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+            border-left: 4px solid #27ae60;
+        }
+
+        .oauth-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #2980b9;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .oauth-info strong {
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .oauth-info small {
+            display: block;
+            margin-top: 8px;
+            opacity: 0.8;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .login-container {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+            
+            h2 {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            input[type="text"], input[type="password"] {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            input[type="submit"] {
+                padding: 16px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>로그인</h2>
+
+    <!-- OAuth2 클라이언트 정보 -->
+    <div class="oauth-info" th:if="${param.client_id}">
+        <strong>
+            <span th:if="${param.client_id[0] == 'habilisadi-client'}">Habilisadi 애플리케이션</span>
+            <span th:if="${param.client_id[0] == 'mobile-app'}">Habilisadi 모바일 앱</span>
+            <span th:if="${param.client_id[0] == 'web-app'}">Habilisadi 웹 애플리케이션</span>
+            <span th:if="${param.client_id[0] != 'habilisadi-client' and param.client_id[0] != 'mobile-app' and param.client_id[0] != 'web-app'}"
+                  th:text="${param.client_id[0]}">클라이언트</span>
+        </strong>에서 로그인을 요청했습니다.
+        <br><small>계속하려면 계정으로 로그인하세요.</small>
+    </div>
+
+    <!-- 에러 메시지 -->
+    <div class="alert alert-danger" th:if="${param.error}">
+        로그인에 실패했습니다. 사용자명과 비밀번호를 확인해주세요.
+    </div>
+
+    <!-- 로그아웃 성공 메시지 -->
+    <div class="alert alert-success" th:if="${param.logout}">
+        성공적으로 로그아웃되었습니다.
+    </div>
+
+    <form method="post" th:action="@{/login}">
+        <div class="form-group">
+            <label for="username">email:</label>
+            <input autofocus id="username" name="username" required
+                   th:value="${param.username != null ? param.username[0] : ''}"
+                   type="text">
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호:</label>
+            <input id="password" name="password" required type="password">
+        </div>
+
+        <!-- CSRF 토큰 -->
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+
+        <input type="submit" value="로그인">
+    </form>
+
+    <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e6ed;">
+        <span style="color: #34495e;">계정이 없으신가요? </span>
+        <a th:href="@{/register}" style="color: #667eea; text-decoration: none; font-weight: 500; transition: all 0.3s ease;">회원가입</a>
+    </div>
+</div>
+</body>
+</html>

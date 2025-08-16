@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Habilisadi - OAuth2 Authorization Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #2980b9;
+        }
+
+        .user-info h3 {
+            margin-bottom: 15px;
+            color: #1565c0;
+        }
+
+        .user-info p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .authorities {
+            background: rgba(39, 174, 96, 0.1);
+            border: 2px solid rgba(39, 174, 96, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #27ae60;
+        }
+
+        .authorities h3 {
+            margin-bottom: 15px;
+            color: #1e8449;
+        }
+
+        .authorities ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .authorities li {
+            background: rgba(39, 174, 96, 0.1);
+            padding: 8px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .info-section {
+            background: rgba(149, 165, 166, 0.1);
+            border: 2px solid rgba(149, 165, 166, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+
+        .info-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .info-section p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .btn {
+                display: block;
+                margin: 10px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Habilisadi OAuth2 Authorization Server</h1>
+
+    <!-- 인증된 사용자 정보 -->
+    <div class="user-info" th:if="${username}">
+        <h3>로그인된 사용자</h3>
+        <p><strong>이메일:</strong> <span th:text="${username}">user@example.com</span></p>
+        <p><strong>로그인 상태:</strong> 인증됨</p>
+    </div>
+
+    <!-- 사용자 권한 정보 -->
+    <div class="authorities" th:if="${authorities}">
+        <h3>사용자 권한</h3>
+        <ul>
+            <li th:each="authority : ${authorities}" th:text="${authority.authority}">ROLE_USER</li>
+        </ul>
+    </div>
+
+    <!-- OAuth2 서버 정보 -->
+    <div class="info-section">
+        <h3>OAuth2 Authorization Server</h3>
+        <p>이 서비스는 OAuth2 인증 서버입니다. 다른 애플리케이션들이 이 서버를 통해 사용자 인증을 수행할 수 있습니다.</p>
+        <p><strong>지원 기능:</strong></p>
+        <ul style="margin-left: 20px; margin-top: 10px;">
+            <li>OAuth2 Authorization Code Flow</li>
+            <li>OpenID Connect (OIDC)</li>
+            <li>JWT 토큰 발급</li>
+            <li>사용자 정보 제공</li>
+        </ul>
+    </div>
+
+    <!-- OAuth2 엔드포인트 정보 -->
+    <div class="info-section">
+        <h3>OAuth2 엔드포인트</h3>
+        <p><strong>Authorization Endpoint:</strong> <code>/oauth2/authorize</code></p>
+        <p><strong>Token Endpoint:</strong> <code>/oauth2/token</code></p>
+        <p><strong>User Info Endpoint:</strong> <code>/userinfo</code></p>
+        <p><strong>JWK Set Endpoint:</strong> <code>/.well-known/jwks.json</code></p>
+        <p><strong>OpenID Configuration:</strong> <code>/.well-known/openid_configuration</code></p>
+    </div>
+
+    <!-- 액션 버튼들 -->
+    <div class="actions">
+        <a th:href="@{/register}" class="btn" th:unless="${username}">회원가입</a>
+        <a th:href="@{/login}" class="btn" th:unless="${username}">로그인</a>
+        
+        <form th:if="${username}" action="/logout" method="post" style="display: inline;">
+            <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+            <button type="submit" class="btn btn-danger">로그아웃</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
