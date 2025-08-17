@@ -1,8 +1,6 @@
 server:
   port: 8080
 
-
-
 spring:
   application:
     name: habilisadi_auth
@@ -46,6 +44,7 @@ registered:
   client:
     id: ${CLIENT_ID:habilisadi}
     redirect-uri: ${DOMAIN_URL:http://localhost:8080}
+    domain: ${DOMAIN_URL:http://localhost:8080}
 
 logging:
   level:

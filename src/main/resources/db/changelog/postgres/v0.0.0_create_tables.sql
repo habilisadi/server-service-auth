@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS users
 );
 --rollback DROP TABLE IF EXISTS users CASCADE;
 
+--changeset system:v0.0.0-create-user_detail-table
 CREATE TABLE IF NOT EXISTS users_detail
 (
     id            BIGSERIAL PRIMARY KEY,
@@ -42,16 +43,37 @@ CREATE TABLE IF NOT EXISTS users_detail
     phone         VARCHAR(20),
     profile_image VARCHAR(255)
 );
+--rollback DROP TABLE IF EXISTS users_detail CASCADE;
+
+--changeset system:v0.0.0-create-passkey_credentials-table
+CREATE TABLE IF NOT EXISTS passkey_credentials
+(
+    id              CHAR(26) PRIMARY KEY,
+    users_Pk        CHAR(26),
+    credential_id   BYTEA NOT NULL,
+    public_key      BYTEA NOT NULL,
+    signature_count BIGINT    DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+--rollback DROP TABLE IF EXISTS users_detail CASCADE;
+
 
 --changeset system:v0.0.0-add-foreign-keys
 ALTER TABLE users_detail
     ADD CONSTRAINT fk_users_detail_users
         FOREIGN KEY (users_pk) REFERENCES users (id);
 
+ALTER TABLE passkey_credentials
+    ADD CONSTRAINT fk_passkey_credentials_users
+        FOREIGN KEY (users_pk) REFERENCES users (id);
+
+
 --changeset system:v0.0.0-add-unique-constraints
 
 ALTER TABLE users
     ADD CONSTRAINT unique_email UNIQUE (email);
+ALTER TABLE passkey_credentials
+    ADD CONSTRAINT unique_credential_id UNIQUE (credential_id)
 --rollback ALTER TABLE users DROP CONSTRAINT unique_email;
 
 
