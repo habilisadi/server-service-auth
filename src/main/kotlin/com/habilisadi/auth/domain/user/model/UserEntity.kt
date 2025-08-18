@@ -2,7 +2,9 @@ package com.habilisadi.auth.domain.user.model
 
 import com.github.f4b6a3.ulid.UlidCreator
 import com.habilisadi.auth.domain.passkey.model.PasskeyCredential
+import com.habilisadi.auth.domain.user.event.UserDeActivatedEvent
 import jakarta.persistence.*
+import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.Instant
 
@@ -28,24 +30,32 @@ class UserEntity(
 
     var createdAt: Instant = Instant.now(),
 
+    var deletedAt: Instant? = null,
+
     @OneToOne(mappedBy = "userEntity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var userDetailEntity: UserDetailEntity? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var passkeyCredentials: MutableList<PasskeyCredential> = mutableListOf()
-) : UserDetails {
+) : UserDetails, AbstractAggregateRoot<UserEntity>() {
     @PrePersist
     fun init() {
         if (id == null) id = UlidCreator.getUlid().toString()
     }
 
-//    fun addPasskeyCredential(passkeyCredential: PasskeyCredential) {
-//        passkeyCredentials.add(passkeyCredential)
-//    }
-//
-//    fun removePasskeyCredential(passkeyCredential: PasskeyCredential) {
-//        passkeyCredentials.remove(passkeyCredential)
-//    }
+    fun addPasskeyCredential(passkeyCredential: PasskeyCredential) {
+        passkeyCredentials.add(passkeyCredential)
+    }
+
+    fun removePasskeyCredential(passkeyCredential: PasskeyCredential) {
+        passkeyCredentials.remove(passkeyCredential)
+    }
+
+    fun deActivate() {
+        this.isActive = false
+        this.deletedAt = Instant.now()
+        registerEvent(UserDeActivatedEvent(id!!))
+    }
 
     override fun getAuthorities() = this.roles.getAuthorities()
 

@@ -5,11 +5,6 @@ import com.github.f4b6a3.ulid.UlidCreator
 import com.habilisadi.auth.adapter.registerdClient.out.CustomRegisteredClientRepository
 import com.habilisadi.auth.application.registerdClient.port.out.JpaRegisteredClientRepository
 import com.habilisadi.auth.domain.registerdClient.model.RegisteredClientEntity
-import com.nimbusds.jose.jwk.JWKSet
-import com.nimbusds.jose.jwk.RSAKey
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet
-import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.SecurityContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,7 +20,6 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod
 import org.springframework.security.oauth2.core.oidc.OidcScopes
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings
@@ -35,10 +29,6 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import java.security.KeyPair
-import java.security.KeyPairGenerator
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
 import java.time.Duration
 import java.time.Instant
 
@@ -54,7 +44,7 @@ class SecurityConfig(
     @Order(1)
     fun authorizationServerSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         val authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer()
-        http.securityMatcher(authorizationServerConfigurer.endpointsMatcher) // 🔹 엔드포인트 매핑
+        http.securityMatcher(authorizationServerConfigurer.endpointsMatcher)
             .with(authorizationServerConfigurer) { configurer ->
                 configurer.oidc(withDefaults())
             }
@@ -180,35 +170,5 @@ class SecurityConfig(
         config.maxAge = 3600L
         source.registerCorsConfiguration("/**", config)
         return source
-    }
-
-    @Bean
-    fun jwtDecoder(jwkSource: JWKSource<SecurityContext>) =
-        OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource)
-
-    @Bean
-    fun jwkSource(): JWKSource<SecurityContext> {
-        val keyPair = generateRsaKey()
-        val publicKey = keyPair.public as RSAPublicKey
-        val privateKey = keyPair.private as RSAPrivateKey
-        val rsaKey = RSAKey.Builder(publicKey)
-            .privateKey(privateKey)
-            .keyID(UlidCreator.getUlid().toString())
-            .build()
-
-        val jwkSet = JWKSet(rsaKey)
-        return ImmutableJWKSet(jwkSet)
-    }
-
-    companion object {
-        private fun generateRsaKey(): KeyPair {
-            return try {
-                val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-                keyPairGenerator.initialize(2048)
-                keyPairGenerator.generateKeyPair()
-            } catch (ex: Exception) {
-                throw IllegalStateException(ex)
-            }
-        }
     }
 }

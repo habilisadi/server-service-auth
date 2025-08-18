@@ -1,4 +1,8 @@
 server:
+  http2:
+    enabled: true
+  ssl:
+    enabled: false
   port: 8080
 
 spring:

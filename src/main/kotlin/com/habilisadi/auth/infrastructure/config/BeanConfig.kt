@@ -12,4 +12,5 @@ class BeanConfig {
     fun passwordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
+    
 }

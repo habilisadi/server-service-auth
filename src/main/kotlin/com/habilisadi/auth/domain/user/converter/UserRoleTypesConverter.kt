@@ -2,7 +2,9 @@ package com.habilisadi.auth.domain.user.converter
 
 import com.habilisadi.auth.domain.user.model.UserRoleType
 import jakarta.persistence.AttributeConverter
+import jakarta.persistence.Converter
 
+@Converter
 class UserRoleTypesConverter : AttributeConverter<MutableSet<UserRoleType>, String> {
     override fun convertToDatabaseColumn(attribute: MutableSet<UserRoleType>?): String {
         return attribute?.joinToString(",") { it.name } ?: ""

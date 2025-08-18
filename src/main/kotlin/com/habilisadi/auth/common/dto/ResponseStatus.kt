@@ -13,6 +13,10 @@ data class ResponseStatus<T>(
         fun <T> error(message: String): ResponseStatus<T> {
             return ResponseStatus(400, message)
         }
+
+        fun <T> successData(data: T, message: String): ResponseStatus<T> {
+            return ResponseStatus(200, message, data)
+        }
     }
 
 }

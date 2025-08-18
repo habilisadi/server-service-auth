@@ -19,6 +19,9 @@ class CreateUserService(
 
         val exists = userRepository.existsByEmail(userDomain.email)
 
+        if (exists) {
+            throw IllegalArgumentException("User already exists")
+        }
 
         userRepository.save(userDomain)
 
