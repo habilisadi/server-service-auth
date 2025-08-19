@@ -52,8 +52,6 @@ class UserEntity(
     }
 
     fun deActivate() {
-        this.isActive = false
-        this.deletedAt = Instant.now()
         registerEvent(UserDeActivatedEvent(id!!))
     }
 

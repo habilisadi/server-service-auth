@@ -1,6 +1,6 @@
 package com.habilisadi.auth.application.user.service
 
-import com.habilisadi.auth.application.user.dto.UpdateUserDetailCommand
+import com.habilisadi.auth.application.user.dto.UserDetailCommand
 import com.habilisadi.auth.application.user.port.`in`.UpdateUserDetailUseCase
 import com.habilisadi.auth.application.user.port.out.UserDetailRepository
 import com.habilisadi.auth.common.dto.ResponseStatus
@@ -13,7 +13,7 @@ class UpdateUserDetailService(
     private val userDetailRepository: UserDetailRepository
 ) : UpdateUserDetailUseCase {
 
-    override fun updateUserDetail(command: UpdateUserDetailCommand): ResponseStatus<Boolean> {
+    override fun updateUserDetail(command: UserDetailCommand.Update): ResponseStatus<Boolean> {
         val userDetail = userDetailRepository.findById(command.id)
             .orElseThrow { IllegalArgumentException("User not found") }
 

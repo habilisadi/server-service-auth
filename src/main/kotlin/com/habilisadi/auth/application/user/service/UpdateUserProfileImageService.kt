@@ -1,6 +1,6 @@
 package com.habilisadi.auth.application.user.service
 
-import com.habilisadi.auth.application.user.dto.UpdateUserProfileCommand
+import com.habilisadi.auth.application.user.dto.UserDetailCommand
 import com.habilisadi.auth.application.user.port.`in`.UpdateUserProfileImageUseCase
 import com.habilisadi.auth.application.user.port.out.UserDetailRepository
 import com.habilisadi.auth.common.dto.ResponseStatus
@@ -13,12 +13,11 @@ class UpdateUserProfileImageService(
     private val userDetailRepository: UserDetailRepository
 ) : UpdateUserProfileImageUseCase {
 
-    override fun updateUserProfileImage(command: UpdateUserProfileCommand): ResponseStatus<String> {
-        val userDetail = userDetailRepository.findById(command.id)
-            .orElseThrow { IllegalArgumentException("User not found") }
+    override fun updateUserProfileImage(command: UserDetailCommand.UpdateProfileImage): ResponseStatus<String> {
+        val userDetail = userDetailRepository.findByUserEntityEmail(command.email)
+            ?: throw IllegalArgumentException("User not found")
 
-        val basePath = "/files/user/$${userDetail.userEntity.id}/profile"
-        val profileImage = userDetail.profileImage.update(basePath, command.filename)
+        val profileImage = userDetail.profileImage.update(command.filePath.value, command.fileName.value)
 
         userDetailRepository.save(userDetail)
 

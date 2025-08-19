@@ -57,6 +57,16 @@ CREATE TABLE IF NOT EXISTS passkey_credentials
 );
 --rollback DROP TABLE IF EXISTS users_detail CASCADE;
 
+CREATE TABLE IF NOT EXISTS pending_files
+(
+    id         CHAR(26) PRIMARY KEY,
+    file_name  VARCHAR(255) NOT NULL,
+    file_path  VARCHAR(255) NOT NULL,
+    status     VARCHAR(20)  NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expired_at TIMESTAMP    NOT NULL
+);
+
 
 --changeset system:v0.0.0-add-foreign-keys
 ALTER TABLE users_detail

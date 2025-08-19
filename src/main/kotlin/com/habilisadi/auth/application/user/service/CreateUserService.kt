@@ -1,6 +1,6 @@
 package com.habilisadi.auth.application.user.service
 
-import com.habilisadi.auth.application.user.dto.CreateUserCommand
+import com.habilisadi.auth.application.user.dto.UserCommand
 import com.habilisadi.auth.application.user.port.`in`.CreateUserUseCase
 import com.habilisadi.auth.application.user.port.out.UserRepository
 import com.habilisadi.auth.common.dto.ResponseStatus
@@ -14,7 +14,7 @@ class CreateUserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : CreateUserUseCase {
-    override fun createUser(command: CreateUserCommand): ResponseStatus<Boolean> {
+    override fun createUser(command: UserCommand.Create): ResponseStatus<Boolean> {
         val userDomain = command.toDomain(passwordEncoder)
 
         val exists = userRepository.existsByEmail(userDomain.email)

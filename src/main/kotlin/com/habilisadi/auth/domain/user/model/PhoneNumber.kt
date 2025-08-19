@@ -14,13 +14,13 @@ data class PhoneNumber(
         val phoneRegex = Regex("^\\+?[0-9]{10,15}$")
 
         fun validate(phone: String): Boolean {
-            return phoneRegex.matches(phone)
+            return phoneRegex.matches(phone.trim())
         }
     }
 
     fun update(phone: String) {
         require(validate(phone)) { "Invalid phone number format" }
-        this.value = phone
+        this.value = phone.trim()
     }
 
 

@@ -1,6 +1,6 @@
 package com.habilisadi.auth.adapter.user.`in`.web
 
-import com.habilisadi.auth.application.user.dto.CreateUserCommand
+import com.habilisadi.auth.application.user.dto.UserCommand
 import com.habilisadi.auth.application.user.port.`in`.CreateUserUseCase
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -31,7 +31,7 @@ class UserController(
         model: Model
     ): String {
         return try {
-            val createUserCommand = CreateUserCommand.create(
+            val createUserCommand = UserCommand.Create.create(
                 email,
                 password,
                 confirmPassword
