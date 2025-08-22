@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS users
 --changeset system:v0.0.0-create-user_detail-table
 CREATE TABLE IF NOT EXISTS users_detail
 (
-    id            BIGSERIAL PRIMARY KEY,
+    id            CHAR(26) PRIMARY KEY,
     users_pk      CHAR(26),
     name          VARCHAR(20),
     phone         VARCHAR(20),
@@ -57,17 +57,6 @@ CREATE TABLE IF NOT EXISTS passkey_credentials
 );
 --rollback DROP TABLE IF EXISTS users_detail CASCADE;
 
-CREATE TABLE IF NOT EXISTS pending_files
-(
-    id         CHAR(26) PRIMARY KEY,
-    file_name  VARCHAR(255) NOT NULL,
-    file_path  VARCHAR(255) NOT NULL,
-    status     VARCHAR(20)  NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expired_at TIMESTAMP    NOT NULL
-);
-
-
 --changeset system:v0.0.0-add-foreign-keys
 ALTER TABLE users_detail
     ADD CONSTRAINT fk_users_detail_users
@@ -76,8 +65,6 @@ ALTER TABLE users_detail
 ALTER TABLE passkey_credentials
     ADD CONSTRAINT fk_passkey_credentials_users
         FOREIGN KEY (users_pk) REFERENCES users (id);
-
-
 --changeset system:v0.0.0-add-unique-constraints
 
 ALTER TABLE users

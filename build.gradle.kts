@@ -37,6 +37,7 @@ dependencies {
     // msa
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
 
     // security
     implementation("org.springframework.boot:spring-boot-starter-security")

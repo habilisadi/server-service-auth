@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package com.habilisadi.file;
+
+option java_multiple_files = true;
+option java_package = "com.habilisadi.file";
+option java_outer_classname = "PendingProto";
+
+service PendingService {
+  rpc savePendingRequests (SavePendingRequest) returns (SavePendingResponse);
+  rpc updatePendingRequests (UpdatePendingRequest) returns (UpdatePendingResponse);
+}
+
+message SavePendingRequest {
+  string userPk = 1;
+  string fileName = 2;
+  string filePath = 3;
+  Destination destination = 4;
+}
+
+message SavePendingResponse {
+  string id = 1;
+  string prevFileName = 2;
+  string prevFilePath = 3;
+  string nextFileName = 4;
+  string nextFilePath = 5;
+  Status status = 6;
+  string createdAt = 7;
+}
+
+message UpdatePendingRequest {
+  string id = 1;
+  string userPk = 2;
+  Status status = 3;
+  Destination destination = 4;
+}
+
+message UpdatePendingResponse {
+  string id = 1;
+  string userPk = 2;
+  string nextFileName = 3;
+  string nextFilePath = 4;
+}
+
+enum Status {
+  PENDING = 0;
+  COMPLETED = 1;
+  FAILED = 2;
+  CANCELLED = 3;
+}
+
+enum Destination {
+  PROFILE = 0;
+}

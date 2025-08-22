@@ -2,12 +2,13 @@ package com.habilisadi.auth.infrastructure.config
 
 
 import com.github.f4b6a3.ulid.UlidCreator
-import com.habilisadi.auth.adapter.registerdClient.out.CustomRegisteredClientRepository
-import com.habilisadi.auth.application.registerdClient.port.out.JpaRegisteredClientRepository
-import com.habilisadi.auth.domain.registerdClient.model.RegisteredClientEntity
+import com.habilisadi.auth.adapter.out.persistence.CustomRegisteredClientRepository
+import com.habilisadi.auth.application.port.out.JpaRegisteredClientRepository
+import com.habilisadi.auth.domain.model.RegisteredClientEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Primary
 import org.springframework.core.annotation.Order
 import org.springframework.http.MediaType
@@ -69,11 +70,14 @@ class SecurityConfig(
     @Order(2)
     fun defaultSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .csrf { it.disable() }
             .authorizeHttpRequests { authorize ->
                 authorize.requestMatchers(
                     "/register",
                     "/login",
                     "/error",
+                    "/api/v1/public/**",
+                    "/api/v2/public/**"
                 ).permitAll()
                 authorize.anyRequest().authenticated()
             }
@@ -94,6 +98,7 @@ class SecurityConfig(
 
 
     @Bean
+    @DependsOn("liquibase")
     @Primary
     fun registeredClientRepository(passwordEncoder: PasswordEncoder): RegisteredClientRepository {
 
